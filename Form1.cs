@@ -14,10 +14,11 @@ namespace TeXtatics
     public partial class Form1 : Form
     {
         const int MAX_LENGTH_OF_WORD = 21;
-                
+        string s_path_Source;
         int[] ar_word_counter = new int[MAX_LENGTH_OF_WORD];
 
-        char[] charSeparators = new char[] { ',','.', ' ', '-', '?', '\n', '\r', '\b', '\t', ']', '[', '*', ')', '(', '}', '{', '\"', '\'', '~', '@', '$', '%', '^', '&', '+', ':', ';', '\\', '/', '<', '>', '!' };
+        char[] charSeparators = new char[] { ',','.', ' ', '-', '?', '\n', '\r', '\b', '\t', '\0', ']', '[', '*', ')', '(', '}', '{', '\"', '~', '@', '$', '%', '^', '&', '+', ':', ';', '\\', '/', '<', '>', '!', '№', '_' };
+        // '\'', 
         string[] result;
         
 
@@ -37,9 +38,9 @@ namespace TeXtatics
             {
                 try
                 {
-                    string s_path_Source = openFileDialog1.FileName;
+                    s_path_Source = openFileDialog1.FileName;
                     btn_SaveResults.Visible = true;
-                    //                    if ((source_file =  File.Open(path_Source, FileMode.Open)) != null)
+//  Весь файл прочитать в объект byte[] ar_sourceText                     
                     using (FileStream fs_source_file = new FileStream(s_path_Source, FileMode.Open, FileAccess.Read))
                     {
                         int i_file_Length = (int)fs_source_file.Length;
@@ -53,12 +54,39 @@ namespace TeXtatics
                             i_read_result_File_Length += n;
                             i_file_Length -= n;
                         }
+//
                         i_read_result_File_Length = ar_sourceText.Length;
-
+//  Данные преобразованы из byte в string предполагая что данные Unicode
                         string resultString = Encoding.UTF8.GetString(ar_sourceText);
 
+//  Данные из единой строки разбиты на массив строк состоящих из одного слова каждая. Все символы кроме апострофа удалены
                         result = resultString.Split(charSeparators, StringSplitOptions.None);
 
+//  Удалить апостроф ' из слов. Он не учавствует в подсчете букв в слове
+                        for (int index = 0; index < result.Length; index++)
+                        {
+                            if(result[index].Contains("\'") == true)
+                            {
+                                int sym_pos = result[index].IndexOf('\'');
+                                result[index] = result[index].Remove(sym_pos, 1);
+                            }
+                        }
+//  Удалить апостроф ’ из слов. Он не учавствует в подсчете букв в слове
+                        for (int index = 0; index < result.Length; index++)
+                        {
+                            if (result[index].Contains("’") == true)
+                            {
+                                int sym_pos = result[index].IndexOf('’');
+                                result[index] = result[index].Remove(sym_pos, 1);
+                            }
+                        }
+
+//  Очистить массив заранее под конечные результаты
+                        for (int index = 1; index < MAX_LENGTH_OF_WORD; index++)
+                        {
+                            ar_word_counter[index] = 0;
+                        }
+// Подсчет статистики
                         foreach (string s_res in result)
                         {
                             ar_word_counter[s_res.Length]++;
@@ -66,13 +94,13 @@ namespace TeXtatics
 
                         int totalword = 0;
 
+//  Сколько всего слов в тексте
                         for(int index = 1; index < MAX_LENGTH_OF_WORD; index ++)
                         {
                             totalword += ar_word_counter[index];
                         }
-
+//  Вывести результаты на UI форму
                         label000.Text = totalword.ToString();
-
                         label01.Text = ar_word_counter[1].ToString();
                         label02.Text = ar_word_counter[2].ToString();
                         label03.Text = ar_word_counter[3].ToString();
@@ -108,8 +136,19 @@ namespace TeXtatics
             Application.Exit();
         }
 
-        private void label31_Click(object sender, EventArgs e)
+         private void btn_SaveResults_Click(object sender, EventArgs e)
         {
+            string s_path_Result = s_path_Source + ".csv";
+
+            using (StreamWriter sw = new StreamWriter(s_path_Result, false, System.Text.Encoding.Default))
+            {
+                sw.WriteLine(s_path_Source + "\n");
+                for (int index = 1; index < MAX_LENGTH_OF_WORD; index++)
+                {
+                    sw.WriteLine(index.ToString() + "," + ar_word_counter[index].ToString());
+                    //sw.WriteLine(ar_word_counter[index].ToString() + "\n");
+                }
+            }
 
         }
     }

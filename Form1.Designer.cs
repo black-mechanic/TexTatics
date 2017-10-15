@@ -102,6 +102,7 @@
             this.btn_SaveResults.Text = "Сохранить результаты";
             this.btn_SaveResults.UseVisualStyleBackColor = true;
             this.btn_SaveResults.Visible = false;
+            this.btn_SaveResults.Click += new System.EventHandler(this.btn_SaveResults_Click);
             // 
             // btn_ExitApplication
             // 
@@ -393,7 +394,6 @@
             this.label010.Size = new System.Drawing.Size(37, 13);
             this.label010.TabIndex = 36;
             this.label010.Text = "00000";
-            this.label010.Click += new System.EventHandler(this.label31_Click);
             // 
             // label09
             // 
