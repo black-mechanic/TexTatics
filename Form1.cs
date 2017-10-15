@@ -15,9 +15,10 @@ namespace TeXtatics
     {
         const int MAX_LENGTH_OF_WORD = 21;
         string s_path_Source;
+        string s_short_path_source;
         int[] ar_word_counter = new int[MAX_LENGTH_OF_WORD];
 
-        char[] charSeparators = new char[] { ',','.', ' ', '-', '?', '\n', '\r', '\b', '\t', '\0', ']', '[', '*', ')', '(', '}', '{', '\"', '~', '@', '$', '%', '^', '&', '+', ':', ';', '\\', '/', '<', '>', '!', '№', '_' };
+        char[] charSeparators = new char[] { ',','.', ' ', '-', '?', '\n', '\r', '\b', '\t', '\0', ']', '[', '*', ')', '(', '}', '{', '\"', '~', '@', '$', '%', '^', '&', '+', ':', ';', '\\', '/', '<', '>', '!', '№', '_', '…'};
         // '\'', 
         string[] result;
         
@@ -38,6 +39,7 @@ namespace TeXtatics
             {
                 try
                 {
+                    s_short_path_source = openFileDialog1.SafeFileName;
                     s_path_Source = openFileDialog1.FileName;
                     btn_SaveResults.Visible = true;
 //  Весь файл прочитать в объект byte[] ar_sourceText                     
@@ -62,6 +64,8 @@ namespace TeXtatics
 //  Данные из единой строки разбиты на массив строк состоящих из одного слова каждая. Все символы кроме апострофа удалены
                         result = resultString.Split(charSeparators, StringSplitOptions.None);
 
+                        int i_example_cnt = 8;
+                        lv_example.Clear();
 //  Удалить апостроф ' из слов. Он не учавствует в подсчете букв в слове
                         for (int index = 0; index < result.Length; index++)
                         {
@@ -70,18 +74,26 @@ namespace TeXtatics
                                 int sym_pos = result[index].IndexOf('\'');
                                 result[index] = result[index].Remove(sym_pos, 1);
                             }
-                        }
 //  Удалить апостроф ’ из слов. Он не учавствует в подсчете букв в слове
-                        for (int index = 0; index < result.Length; index++)
-                        {
                             if (result[index].Contains("’") == true)
                             {
                                 int sym_pos = result[index].IndexOf('’');
                                 result[index] = result[index].Remove(sym_pos, 1);
                             }
+//  Добавить на форму несколько слов для контроля. Количество определяется переменной i_example_cnt
+                            if (i_example_cnt > 0)
+                            {
+                                if(result[index].Length > 4)
+                                {
+                                    ListViewItem lvi_words = new ListViewItem(result[index]);
+                                    lv_example.Items.Add(lvi_words);
+                                    i_example_cnt--;
+                                }
+                            }
                         }
+                        
 
-//  Очистить массив заранее под конечные результаты
+                        //  Очистить массив заранее под конечные результаты
                         for (int index = 1; index < MAX_LENGTH_OF_WORD; index++)
                         {
                             ar_word_counter[index] = 0;
@@ -121,6 +133,8 @@ namespace TeXtatics
                         label018.Text = ar_word_counter[18].ToString();
                         label019.Text = ar_word_counter[19].ToString();
                         label020.Text = ar_word_counter[20].ToString();
+
+                        label_status.Text = " Файл " + s_short_path_source + " обработан.";
                     }
                 }
                 catch (Exception ex)
@@ -148,6 +162,8 @@ namespace TeXtatics
                     sw.WriteLine(index.ToString() + "," + ar_word_counter[index].ToString());
                     //sw.WriteLine(ar_word_counter[index].ToString() + "\n");
                 }
+
+                label_status.Text = " Файл " + s_path_Result + " сохранён.";
             }
 
         }
