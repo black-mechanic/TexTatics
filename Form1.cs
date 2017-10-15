@@ -64,7 +64,7 @@ namespace TeXtatics
 //  Данные из единой строки разбиты на массив строк состоящих из одного слова каждая. Все символы кроме апострофа удалены
                         result = resultString.Split(charSeparators, StringSplitOptions.None);
 
-                        int i_example_cnt = 8;
+                        int i_example_cnt = 12;
                         lv_example.Clear();
 //  Удалить апостроф ' из слов. Он не учавствует в подсчете букв в слове
                         for (int index = 0; index < result.Length; index++)
@@ -162,8 +162,13 @@ namespace TeXtatics
                     sw.WriteLine(index.ToString() + "," + ar_word_counter[index].ToString());
                     //sw.WriteLine(ar_word_counter[index].ToString() + "\n");
                 }
-
-                label_status.Text = " Файл " + s_path_Result + " сохранён.";
+                int lenstring = s_path_Result.Length;
+                //string s_status_string = s_path_Result;
+                if (lenstring > 50)
+                {
+                    s_path_Result = s_path_Result.Substring((lenstring - 50));
+                }
+                label_status.Text = " Файл .." + s_path_Result + " сохранён.";
             }
 
         }
